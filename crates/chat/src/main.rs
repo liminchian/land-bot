@@ -1,10 +1,10 @@
-// Reference: https://github.com/rwf2/Rocket/blob/master/examples/chat/src/main.rs
 #[macro_use]
 extern crate rocket;
 
 #[cfg(test)]
 mod tests;
 
+// Reference: https://github.com/rwf2/Rocket/blob/master/examples/chat/src/main.rs
 use rocket::{
     form::Form,
     fs::{relative, FileServer},
