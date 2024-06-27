@@ -1,4 +1,10 @@
 // Reference: https://github.com/rwf2/Rocket/blob/master/examples/chat/src/main.rs
+#[macro_use]
+extern crate rocket;
+
+#[cfg(test)]
+mod tests;
+
 use rocket::{
     form::Form,
     fs::{relative, FileServer},
@@ -11,10 +17,8 @@ use rocket::{
 };
 use serde::{Deserialize, Serialize};
 
-#[macro_use]
-extern crate rocket;
-
 #[derive(Debug, Clone, FromForm, Serialize, Deserialize)]
+#[cfg_attr(test, derive(PartialEq, UriDisplayQuery))]
 #[serde(crate = "rocket::serde")]
 struct Message {
     #[field(validate = len(..30))]
