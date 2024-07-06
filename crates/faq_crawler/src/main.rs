@@ -1,28 +1,50 @@
-use anyhow::Result;
-use clap::{Arg, Command};
-use dotenv::dotenv;
-use faq_crawler::commands;
+use reqwest::{self, blocking::Client};
+use scraper::{Html, Selector};
+use std::error::Error;
 
-fn main() -> Result<()> {
-    dotenv().ok();
+#[derive(Debug)]
+pub struct MoiQaData {
+    pub question: String,
+    pub answers: String,
+}
 
-    let mut command = Command::new("faq_crawler")
-        .version("1.0")
-        .author("liminchian <liminchian@gmail.com>")
-        .about("爬取地政相關常見問題")
-        .arg(
-            Arg::new("config")
-                .short('c')
-                .long("config")
-                .help("設定檔案路徑")
-                .default_value("config.json"),
-        );
+fn main() -> Result<(), Box<dyn Error>> {
+    let url = "https://www.land.moi.gov.tw/chhtml/landQA/55";
+    let client = Client::new();
+    let mut data = vec![];
 
-    command = commands::configuration(command);
+    for page in 1..100 {
+        let response = client
+            .get(url)
+            .query(&[("qphclass", ""), ("pagenum", &page.to_string())])
+            .send()?;
+        let body = response.text()?;
+        let document = Html::parse_document(&body);
+        let question_selector = Selector::parse("p.qa_question")?;
+        let answer_selector = Selector::parse("div.qa_text")?;
+        let questions = document.select(&question_selector);
+        let answers = document.select(&answer_selector);
+        let page_data: Vec<MoiQaData> = questions
+            .zip(answers)
+            .map(|(q, a)| MoiQaData {
+                question: q.text().collect::<Vec<_>>().join(" ").to_string(),
+                answers: a.text().collect::<Vec<_>>().join(" ").to_string(),
+            })
+            .collect();
+        if !page_data.is_empty() {
+            println!(
+                "完成第 {} 頁的爬取，共取得 {} 筆問答資料",
+                page,
+                page_data.len()
+            );
+            data.extend(page_data);
+        } else {
+            println!("最終頁為 {}", page - 1);
+            break;
+        }
+    }
 
-    let matches = command.get_matches();
-
-    commands::handler(&matches)?;
+    println!("{:?}", data);
 
     Ok(())
 }
