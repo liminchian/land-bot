@@ -2,14 +2,8 @@ use config::{Config, Environment, File};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Default)]
-pub struct ConfigInfo {
-    pub location: Option<String>,
-    pub env_prefix: Option<String>,
-}
-
-#[derive(Debug, Deserialize, Default)]
 pub struct Database {
-    pub url: Option<String>,
+    pub url: String,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -19,8 +13,6 @@ pub struct Logging {
 
 #[derive(Debug, Deserialize, Default)]
 pub struct Settings {
-    #[serde(default)]
-    pub config: ConfigInfo,
     #[serde(default)]
     pub database: Database,
     #[serde(default)]
@@ -36,8 +28,6 @@ impl Settings {
                     .separator("__")
                     .prefix_separator("__"),
             )
-            .set_override("config.location", location)?
-            .set_override("config.env_prefix", env_prefix)?
             .build()?;
 
         let settings = s.try_deserialize()?;
