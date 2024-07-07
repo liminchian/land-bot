@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Arg, Command};
+use crawler::commands;
 use dotenv::dotenv;
-use faq_crawler::commands;
 
 fn main() -> Result<()> {
     dotenv().ok();

@@ -1,6 +1,7 @@
 use clap::{ArgMatches, Command};
 
 mod moi;
+mod migrate;
 
 pub fn configuration(command: Command) -> Command {
     command.subcommand(moi::configure())
