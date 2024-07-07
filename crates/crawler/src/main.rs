@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Arg, Command};
+use crawler::{commands, settings};
 use dotenv::dotenv;
-use faq_crawler::commands;
 
 fn main() -> Result<()> {
     dotenv().ok();
@@ -22,7 +22,14 @@ fn main() -> Result<()> {
 
     let matches = command.get_matches();
 
-    commands::handler(&matches)?;
+    let config_location = matches
+        .get_one::<String>("config")
+        .map(|s| s.as_str())
+        .unwrap_or("");
+
+    let settings = settings::Settings::new(config_location, "CRAWL")?;
+
+    commands::handler(&matches, settings)?;
 
     Ok(())
 }

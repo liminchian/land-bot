@@ -24,7 +24,7 @@ pub fn handle(matches: &ArgMatches) -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn crawl() -> Result<()> {
+fn crawl() -> Result<()> {
     let client = Client::new();
     let mut data = vec![];
 
