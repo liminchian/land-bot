@@ -1,14 +1,15 @@
 use clap::{ArgMatches, Command};
 
-mod moi;
+use crate::settings::Settings;
+
+mod hello;
 mod migrate;
 
 pub fn configuration(command: Command) -> Command {
-    command.subcommand(moi::configure())
+    command.subcommand(hello::configure())
 }
 
-pub fn handler(matches: &ArgMatches) -> anyhow::Result<()> {
-    moi::handle(matches)?;
-
+pub fn handler(matches: &ArgMatches, _settings: &Settings) -> anyhow::Result<()> {
+    hello::handle(matches, _settings)?;
     Ok(())
 }

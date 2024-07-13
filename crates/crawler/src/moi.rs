@@ -4,6 +4,8 @@ use reqwest::{self, blocking::Client};
 use scraper::{Html, Selector};
 use uuid::Uuid;
 
+use crate::settings::Settings;
+
 static MOI_FAQ_URL: &str = "https://www.land.moi.gov.tw/chhtml/landQA/55";
 
 #[derive(Debug)]
@@ -17,9 +19,9 @@ pub fn configure() -> Command {
     Command::new("moi").about("台灣內政部地政相關常見問答資料爬取")
 }
 
-pub fn handle(matches: &ArgMatches) -> anyhow::Result<()> {
-    if let Some(matches) = matches.subcommand_matches("moi") {
-        todo!()
+pub fn handle(matches: &ArgMatches, settings: &Settings) -> anyhow::Result<()> {
+    if let Some(_matches) = matches.subcommand_matches("moi") {
+        crawl()?;
     }
     Ok(())
 }
