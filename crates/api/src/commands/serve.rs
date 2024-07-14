@@ -1,7 +1,8 @@
-use axum::Router;
 use clap::{Arg, ArgMatches, Command};
+use std::sync::Arc;
+use tower_http::trace::TraceLayer;
 
-use crate::settings::Settings;
+use crate::{path, settings::Settings, state::ApplicationState};
 
 pub fn configure() -> Command {
     Command::new("serve").about("啟用 api 伺服器").arg(
@@ -25,15 +26,18 @@ pub fn handle(matches: &ArgMatches, _settings: &Settings) -> anyhow::Result<()> 
     Ok(())
 }
 
-fn start_tokio(port: u16, _settings: &Settings) -> anyhow::Result<()> {
+fn start_tokio(port: u16, settings: &Settings) -> anyhow::Result<()> {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
         .unwrap()
         .block_on(async move {
+            let state = Arc::new(ApplicationState::new(settings)?);
             let addr = format!("0.0.0.0:{}", port);
             let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-            let app = Router::new();
+            let app = path::configure(state).layer(TraceLayer::new_for_http());
+
+            info!("啟動 Axum 伺服器在接口 {}", port);
 
             axum::serve(listener, app).await.unwrap();
 
