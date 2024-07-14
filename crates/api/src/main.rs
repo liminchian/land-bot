@@ -6,7 +6,7 @@ use dotenv::dotenv;
 fn main() -> Result<()> {
     dotenv().ok();
 
-    let mut command = Command::new("faq_crawler")
+    let mut command = Command::new("api")
         .version("1.0")
         .author("liminchian <liminchian@gmail.com>")
         .about("爬取地政相關常見問題")
@@ -14,8 +14,10 @@ fn main() -> Result<()> {
             Arg::new("config")
                 .short('c')
                 .long("config")
+                .value_name("PATH")
+                .value_parser(clap::value_parser!(std::path::PathBuf))
                 .help("設定檔案路徑")
-                .default_value("config.json"),
+                .default_value("../../config.json"),
         );
 
     command = commands::configuration(command);
@@ -27,7 +29,7 @@ fn main() -> Result<()> {
         .map(|s| s.as_str())
         .unwrap_or("");
 
-    let settings = settings::Settings::new(config_location, "CRAWLER")?;
+    let settings = settings::Settings::new(config_location, "API")?;
 
     commands::handler(&matches, &settings)?;
 

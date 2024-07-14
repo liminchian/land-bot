@@ -8,13 +8,15 @@ pub fn configure() -> Command {
         Arg::new("port")
             .short('p')
             .long("port")
+            .value_name("PORT")
+            .value_parser(clap::value_parser!(u16))
             .help("預設的伺服器接口")
             .default_value("8080"),
     )
 }
 
 pub fn handle(matches: &ArgMatches, _settings: &Settings) -> anyhow::Result<()> {
-    if let Some(_matches) = matches.subcommand_matches("serve") {
+    if let Some(matches) = matches.subcommand_matches("serve") {
         let port = *matches.get_one::<u16>("port").unwrap();
 
         start_tokio(port, _settings)?;
