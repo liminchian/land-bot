@@ -1,10 +1,7 @@
 use anyhow::{Error as E, Result};
-use clap::{ArgMatches, Command};
 use reqwest::{self, blocking::Client};
 use scraper::{Html, Selector};
 use uuid::Uuid;
-
-use crate::settings::Settings;
 
 static MOI_FAQ_URL: &str = "https://www.land.moi.gov.tw/chhtml/landQA/55";
 
@@ -13,17 +10,6 @@ pub struct MoiQaData {
     pub id: String,
     pub question: String,
     pub answers: String,
-}
-
-pub fn configure() -> Command {
-    Command::new("moi").about("台灣內政部地政相關常見問答資料爬取")
-}
-
-pub fn handle(matches: &ArgMatches, settings: &Settings) -> anyhow::Result<()> {
-    if let Some(_matches) = matches.subcommand_matches("moi") {
-        crawl()?;
-    }
-    Ok(())
 }
 
 pub fn crawl() -> Result<()> {
@@ -68,16 +54,4 @@ pub fn crawl() -> Result<()> {
     }
 
     Ok(())
-}
-
-pub async fn add(data: MoiQaData) -> Result<()> {
-    todo!("寫入資料進入資料庫中")
-}
-
-pub async fn update(id: String) -> Result<()> {
-    todo!("更新資料庫中的資料")
-}
-
-pub async fn delete(id: String) -> Result<MoiQaData> {
-    todo!("刪除資料庫中的資料")
 }
