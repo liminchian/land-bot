@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate tracing;
-pub mod cli;
 mod moi;
 
 use std::str::FromStr;
