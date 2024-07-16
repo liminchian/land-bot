@@ -4,12 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+migration = { path = "../migration" }
+entity = { path = "../entity" }
+crawler = { path = "../crawler" }
 sea-orm = { version = "0.12.15", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 tokio = { version = "1.38.0", features = ["full"] }
 tracing = { version = "0.1.40", features = ["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["registry", "env-filter"] }
 uuid = { version = "1.9.1", features = ["v4"] }
-migration = {path = "../migration"}
 clap = "4.5.8"
 dotenv = "0.15.0"
 serde = { version = "1.0.203", features = ["derive"] }
