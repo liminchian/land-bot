@@ -4,11 +4,13 @@ mod moi;
 
 use std::str::FromStr;
 
-use moi::MoiCrawler;
-
 pub trait CrawlerTrait {
-    fn crawl(&mut self) -> anyhow::Result<()>;
+    fn crawl(&mut self) -> anyhow::Result<Vec<impl CrawlerResult>>;
     fn source(&self) -> String;
+}
+
+pub trait CrawlerResult {
+    fn get(&self, name: &str) -> impl ToString;
 }
 
 #[derive(Debug)]
@@ -30,7 +32,7 @@ impl FromStr for Crawler {
 impl Crawler {
     pub fn into(self) -> impl CrawlerTrait {
         match self {
-            Crawler::Moi => MoiCrawler::default(),
+            Crawler::Moi => moi::CrawlerImpl,
             _ => todo!(),
         }
     }

@@ -3,34 +3,34 @@ use reqwest::{self, blocking::Client};
 use scraper::{Html, Selector};
 use uuid::Uuid;
 
-use crate::CrawlerTrait;
+use crate::{CrawlerResult, CrawlerTrait};
 
 static ENTRY_URL: &str = "https://www.land.moi.gov.tw/chhtml/landQA/55";
 
 #[derive(Debug, Clone)]
-pub struct MoiData {
+struct MoiResult {
     pub id: String,
     pub question: String,
     pub answer: String,
 }
 
-pub struct MoiCrawler {
-    pub data: Vec<MoiData>,
-    pub source: String,
-}
-
-impl Default for MoiCrawler {
-    fn default() -> Self {
-        Self {
-            data: vec![],
-            source: "moi".to_string(),
+impl CrawlerResult for MoiResult {
+    fn get(&self, name: &str) -> impl ToString {
+        match name {
+            "id" => &self.id,
+            "question" => &self.question,
+            "answer" => &self.answer,
+            _ => "",
         }
     }
 }
 
-impl CrawlerTrait for MoiCrawler {
-    fn crawl(&mut self) -> Result<()> {
+pub struct CrawlerImpl;
+
+impl CrawlerTrait for CrawlerImpl {
+    fn crawl(&mut self) -> Result<Vec<impl CrawlerResult>> {
         let client = Client::new();
+        let mut data = vec![];
 
         for page in 1..100 {
             let response = client
@@ -48,9 +48,9 @@ impl CrawlerTrait for MoiCrawler {
             let questions = document.select(&question_selector);
             let answers = document.select(&answer_selector);
 
-            let page_data: Vec<MoiData> = questions
+            let page_data: Vec<MoiResult> = questions
                 .zip(answers)
-                .map(|(q, a)| MoiData {
+                .map(|(q, a)| MoiResult {
                     id: Uuid::new_v4().to_string(),
                     question: q.text().collect::<Vec<_>>().join(" ").to_string(),
                     answer: a.text().collect::<Vec<_>>().join(" ").to_string(),
@@ -62,16 +62,16 @@ impl CrawlerTrait for MoiCrawler {
                     page,
                     page_data.len()
                 );
-                self.data.extend(page_data);
+                data.extend(page_data);
             } else {
                 info!("最終頁為 {}", page - 1);
                 break;
             }
         }
-        Ok(())
+        Ok(data)
     }
 
     fn source(&self) -> String {
-        self.source.to_string()
+        "moi".to_string()
     }
 }
