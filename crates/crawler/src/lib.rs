@@ -3,6 +3,8 @@ extern crate tracing;
 pub mod cli;
 mod moi;
 
+use std::str::FromStr;
+
 use moi::MoiCrawler;
 
 pub trait CrawlerTrait {
@@ -10,14 +12,26 @@ pub trait CrawlerTrait {
     fn source(&self) -> String;
 }
 
+#[derive(Debug)]
 pub enum Crawler {
-    Moi(MoiCrawler),
+    Moi,
+}
+
+impl FromStr for Crawler {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> anyhow::Result<Self> {
+        match s.to_lowercase().as_str() {
+            "moi" => Ok(Crawler::Moi),
+            _ => Err(anyhow::Error::msg("不在清單中的來源")),
+        }
+    }
 }
 
 impl Crawler {
     pub fn into(self) -> impl CrawlerTrait {
         match self {
-            Crawler::Moi(crawler) => crawler,
+            Crawler::Moi => MoiCrawler::default(),
             _ => todo!(),
         }
     }
