@@ -8,8 +8,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 llama-cpp-python = {version = "^0.2.82", source = "llama-cpp-python"}
-langchain-community = "^0.2.10"
-langchain = "^0.2.11"
 
 [[tool.poetry.source]]
 name = "llama-cpp-python"
